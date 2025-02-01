@@ -35,13 +35,14 @@ class CashCardController {
 
     }
     @GetMapping
+//    private ResponseEntity<Iterable<CashCard>> findAll() {
+//        return ResponseEntity.ok(cashCardRepository.findAll());
+//    }
     private ResponseEntity<List<CashCard>> findAll(Pageable pageable){
         Page<CashCard> page = cashCardRepository.findAll(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSortOr(Sort.by(Sort.Direction.DESC, "amount"))));
         return ResponseEntity.ok(page.getContent());
     }
-    private ResponseEntity<Iterable<CashCard>> findAll() {
-        return ResponseEntity.ok(cashCardRepository.findAll());
-    }
+
 
     @PostMapping
     private ResponseEntity<Void> createCashCard(@RequestBody CashCard newCashCardRequest, UriComponentsBuilder ucb){
