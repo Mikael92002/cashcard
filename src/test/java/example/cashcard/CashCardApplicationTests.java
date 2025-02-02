@@ -49,7 +49,7 @@ class CashCardApplicationTests {
 	@Test
 	@DirtiesContext
 	void shouldCreateANewCashCard(){
-		CashCard newCashCard = new CashCard(null,250.00, "sarah1");
+		CashCard newCashCard = new CashCard(null,250.00, null);
 
 		ResponseEntity<Void> createResponse = restTemplate.withBasicAuth("sarah1","abc123").postForEntity("/cashcards", newCashCard, Void.class);
 
@@ -120,6 +120,20 @@ class CashCardApplicationTests {
 
 		JSONArray amounts = documentContext.read("$..amount");
 		assertThat(amounts).containsExactly(150.00,123.45,1.00);
+	}
+
+	@Test
+	void shouldRejectUsersWhoAreNotCardOwners(){
+		ResponseEntity<String> response = restTemplate.withBasicAuth("hank-owns-no-cards", "qrs456").getForEntity("/cashcards/99", String.class);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+	}
+
+	@Test
+	void shouldNotAllowAccessToCashCardsTheyDoNotOwn(){
+		ResponseEntity<String> response = restTemplate.withBasicAuth("sarah1", "abc123").getForEntity("/cashcards/102", String.class);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
 
 }
