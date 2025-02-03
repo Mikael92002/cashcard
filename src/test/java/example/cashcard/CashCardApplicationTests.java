@@ -24,7 +24,7 @@ class CashCardApplicationTests {
 	TestRestTemplate
 	restTemplate;
 
-	//implementing GET/Read tests:
+//implementing GET/Read tests:
 	@Test
 	void shouldReturnACashCardWhenDataIsSaved(){
 		ResponseEntity<String> response = restTemplate.withBasicAuth("sarah1", "abc123").getForEntity("/cashcards/99", String.class);
@@ -47,7 +47,7 @@ class CashCardApplicationTests {
 		assertThat(response.getBody()).isBlank();
 	}
 
-	//implementing POST/Create tests:
+//implementing POST/Create tests:
 	@Test
 	@DirtiesContext
 	void shouldCreateANewCashCard(){
@@ -138,6 +138,7 @@ class CashCardApplicationTests {
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
 
+//implementing PUT/UPDATE tests:
 	@Test
 	@DirtiesContext
 	void shouldUpdateAnExistingCashCard(){
@@ -180,6 +181,7 @@ class CashCardApplicationTests {
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}
 
+//implementing DELETE tests:
 	@Test
 	@DirtiesContext
 	void shouldDeleteAnExistingCashCard(){
@@ -197,6 +199,17 @@ class CashCardApplicationTests {
 		ResponseEntity<Void> deleteResponse = restTemplate.withBasicAuth("sarah1","abc123").exchange("/cashcards/99999", HttpMethod.DELETE, null, Void.class);
 
 		assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	}
+
+	@Test
+	void shouldNotAllowDeletionOfCashCardsTheyDoNotOwn(){
+		ResponseEntity<Void> deleteResponse = restTemplate.withBasicAuth("sarah1", "abc123").exchange("/cashcards/102", HttpMethod.DELETE, null, Void.class);
+
+		assertThat(deleteResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+		ResponseEntity<String> getResponse = restTemplate.withBasicAuth("kumar2", "xyz789").getForEntity("/cashcards/102", String.class);
+
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
 }
